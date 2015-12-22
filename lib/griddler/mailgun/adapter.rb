@@ -16,7 +16,7 @@ module Griddler
         {
           to: to_recipients,
           cc: cc_recipients,
-          bcc: Array.wrap(param_or_header(:Bcc)),
+          bcc: determine_bcc,
           from: determine_sender,
           subject: params[:subject],
           text: params['body-plain'],
@@ -31,6 +31,11 @@ module Griddler
       def determine_sender
         sender = param_or_header(:From)
         sender ||= params[:sender]
+      end
+      
+      def determine_bcc
+        return Array.wrap(param_or_header(:Bcc)) if param_or_header(:Bcc)
+        Array.wrap(params[:recipient]) - cc_recipients - to_recipients
       end
 
       def to_recipients
